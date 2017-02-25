@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,6 +28,38 @@ public class ASNDb {
     private static String dbPwd = "thuc1980";
     private static String sqlPapersByYear = "select distinct idPaper from paper where year = ?";
     private static String sqlPaperRef = "select idPaper, idPaperRef from paper_paper where idPaper = ?";
+    
+    public static Connection getDBConnection(){
+        Connection con = null;
+        try {
+            con = DriverManager.getConnection(dbUrl, dbUser, dbPwd);
+        } catch (SQLException ex) {
+            Logger.getLogger(ASNDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return con;
+    }
+    public static List<Integer> getRefListFromDB(int idPaper){
+        List<Integer> refList = null;
+        Connection con = getDBConnection();
+        PreparedStatement refPapers;
+        try {
+            refPapers = con.prepareStatement(sqlPaperRef);
+            refPapers.setInt(1, idPaper);
+            ResultSet rs = refPapers.executeQuery();
+            while (rs.next()){
+                refList.add(rs.getInt("idPaperRef"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ASNDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ASNDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return refList;
+    }
     
     public static void getPaperCitationByYear(int year, String outputFile){
         BufferedWriter outStream = null;

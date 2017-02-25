@@ -26,49 +26,11 @@ import static vn.edu.uit.etd.LdaGibbsSampler.shadeDouble;
 public class CitationLda {
     public static void main(String[] args){
         String citationFile = "/Users/thucnt/git/ETD/data/papers2005.txt"; 
-        BufferedReader inputStream = null;
-        HashMap<Integer,List<Integer>> papers = new HashMap<Integer,List<Integer>>();
-        HashSet<Integer> refList = new HashSet<Integer>();//store reference id paper in corpus
-        try {
-            inputStream = new BufferedReader(new FileReader(citationFile));
-            int count = 0;
-            while (count < 20){
-                String line = inputStream.readLine();
-                if (line != null){
-                String[] tmp = line.split(";");
-                if (tmp.length == 2){
-                    Integer idPaper = new Integer(tmp[0]);
-                    String[] ref = tmp[1].split(",");
-                    List<Integer> refPapers = new ArrayList();
-                    for (String s : ref){
-                        Integer refId = new Integer(s);
-                        refList.add(refId);
-                        refPapers.add(refId);
-                    }
-                    papers.put(idPaper, refPapers);
-                }
-                count++;
-            }
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        int[][] documents = null;
-        documents = new int[papers.size()][];
-        int i = 0;
-        for (Map.Entry<Integer, List<Integer>> entry : papers.entrySet()) {
-            Integer key = entry.getKey();
-            List<Integer> value = entry.getValue();
-            documents[i] = new int[value.size()];
-            for (int j = 0; j < documents[i].length; j++){
-                documents[i][j] = value.get(j);
-            }
-            i++;
-        }
+        Corpus corpus = new Corpus(citationFile);
+        
+        int[][] documents = corpus.getDocumentMatrix();
         // vocabulary
-        int V = refList.size();
+        int V = corpus.getSize();
         int M = documents.length;
         // # topics
         int K = 2;
@@ -76,6 +38,13 @@ public class CitationLda {
         double alpha = 2;
         double beta = .5;
 
+        System.out.println("Documnet matrix ");
+//        for (i  = 0; i < documents.length; i++){
+//            for (int j = 0; j < documents[i].length; j++){
+//                System.out.print(documents[i][j] + "\t");
+//                System.out.println();
+//            }
+//        }
         System.out.println("Latent Dirichlet Allocation using Gibbs Sampling.");
         LdaGibbsSampler lda = new LdaGibbsSampler(documents, V);
         lda.configure(10000, 2000, 100, 10);

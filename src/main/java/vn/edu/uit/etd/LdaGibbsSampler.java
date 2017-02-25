@@ -154,7 +154,7 @@ public class LdaGibbsSampler
     {
         int M = documents.length;
 
-        // initialise count variables. 初始化计数器
+        // initialise count variables.
         nw = new int[V][K];
         nd = new int[M][K];
         nwsum = new int[K];
@@ -163,7 +163,7 @@ public class LdaGibbsSampler
         // The z_i are are initialised to values in [1,K] to determine the
         // initial state of the Markov chain.
 
-        z = new int[M][];   // z_i := 1到K之间的值，表示马氏链的初始状态
+        z = new int[M][];   // z_i := 1
         for (int m = 0; m < M; m++)
         {
             int N = documents[m].length;
