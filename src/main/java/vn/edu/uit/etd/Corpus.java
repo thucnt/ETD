@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 public class Corpus {
     private String citationFile;
     private int[][] documents;
-    //private HashSet<Integer> refList;//store reference id paper in corpus
+    private HashSet<Integer> refList;//store reference id paper in corpus
     private HashMap<Integer,Integer> corpusId2PaperId;
     
     public Corpus(String citationFile){
@@ -49,7 +49,7 @@ public class Corpus {
     private void createDocumentMatrix(String citationFile){
         BufferedReader inputStream = null;
         HashMap<Integer,List<Integer>> papers = new HashMap<Integer,List<Integer>>();
-        //refList = new HashSet<Integer>();
+        refList = new HashSet<Integer>();
         corpusId2PaperId = new HashMap<>();
         try {
             inputStream = new BufferedReader(new FileReader(citationFile));
@@ -65,7 +65,7 @@ public class Corpus {
                         List<Integer> refPapers = new ArrayList();
                         for (String s : ref){
                             Integer refId = this.mappingPaperId2CorpusId(new Integer(s));
-                            //refList.add(refId);
+                            refList.add(refId);
                             refPapers.add(refId);
                         }
                         papers.put(key, refPapers);
@@ -78,26 +78,30 @@ public class Corpus {
         } catch (IOException ex) {
             Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
         }
-        documents = new int[corpusId2PaperId.entrySet().size()][];
-        
+        //documents = new int[corpusId2PaperId.entrySet().size()][];
+        documents = new int[5][];
+        int i = 0;
         for (Map.Entry<Integer, List<Integer>> entry : papers.entrySet()) {
             Integer key = entry.getKey();
             List<Integer> value = entry.getValue();
             int size = value.size();
             if (size != 0){
-                documents[key - 1] = new int[value.size()];
-                for (int j = 0; j < documents[key - 1].length; j++){
-                    documents[key - 1][j] = value.get(j);               
+                documents[i] = new int[value.size()];
+                for (int j = 0; j < documents[i].length; j++){
+                    documents[i][j] = value.get(j);               
                 }
-            }else{
-                documents[key - 1] = new int[1];
-                documents[key - 1][0] = key;
             }
+            i++;
         }
-        validateDocumentMatrix();
+        //validateDocumentMatrix();
     }
     private void validateDocumentMatrix(){
-       
+        for (int i = 0; i < documents.length; i++){
+            if (documents[i] == null){
+                documents[i] = new int[1];
+                documents[i][0] = (i + 1);
+            }
+        }
     }
 
     int[][] getDocumentMatrix() {
@@ -107,4 +111,9 @@ public class Corpus {
     int getSize() {
         return corpusId2PaperId.keySet().size();
     }
+
+    public HashSet<Integer> getRefList() {
+        return refList;
+    }
+    
 }
