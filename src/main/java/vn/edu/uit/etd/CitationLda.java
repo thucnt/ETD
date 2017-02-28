@@ -49,7 +49,7 @@ public class CitationLda {
 //        int V = 17;
         //int M = documents.length;
         // # topics
-        int K = 3;
+        int K = 5;
         // good values alpha = 2, beta = .5
         double alpha = 2;
         double beta = .5;
@@ -104,11 +104,27 @@ public class CitationLda {
             System.out.print("   " + w % 10 + "    ");
         }
         System.out.println();
+        Map<Integer,List<Integer>> topicsKeyPapers = new HashMap<>();
+        for (int i = 0; i < K; i++){
+            topicsKeyPapers.put(i, new ArrayList<>());
+        }
         for (int k = 0; k < phi.length; k++) {
             System.out.print(k + "\t");
             for (int w = 0; w < phi[k].length; w++) {
-                System.out.print(phi[k][w] + " ");
+                //System.out.print(phi[k][w] + " ");
                 //System.out.print(shadeDouble(phi[k][w], 1) + " ");
+                if (phi[k][w] >= 0.05){
+                    topicsKeyPapers.get(k).add(w);
+                }
+            }
+            System.out.println();
+        }
+        for (Map.Entry<Integer,List<Integer>> entry : topicsKeyPapers.entrySet()){
+            Integer topic = entry.getKey();
+            List<Integer> keys = entry.getValue();
+            System.out.println("Key papers of topic: " + topic);
+            for (Integer i : keys){
+                System.out.print(i + ";");
             }
             System.out.println();
         }
