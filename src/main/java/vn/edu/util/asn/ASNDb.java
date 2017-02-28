@@ -13,15 +13,17 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
 
 /**
  *
@@ -106,16 +108,59 @@ public class ASNDb {
             }
         }
     }
+    
+    public List<Integer> getPaperListBeforeYear(int year){
+        String sqlPapersBeforeYear = "select distinct idPaper from paper where year <= ? and year >=1970";
+        List<Integer> papers = new ArrayList<>();
+        Connection con = getDBConnection();
+        PreparedStatement idPapers;
+        try {
+            idPapers = con.prepareStatement(sqlPapersBeforeYear);
+            idPapers.setInt(1, year);
+            ResultSet rs = idPapers.executeQuery();
+            while (rs.next()) {
+                papers.add(rs.getInt("idPaper"));
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ASNDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            con.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(ASNDb.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return papers;
+    }
+    public int[][] createMatrixFromYear(int year){
+        int[][] matrix = null;
+        List<Integer> idPapers = getPaperListBeforeYear(year);
+        matrix = new int[idPapers.size()][];
+        for (int i = 0; i < matrix.length; i++) {
+            List<Integer> list = getRefListFromDB(idPapers.get(i));
+            if (list.size() == 0){
+                matrix[i] = new int[1];
+                matrix[i][0] = idPapers.get(i);
+            }
+            else{
+                matrix[i] = new int[list.size()];
+                for (int j = 0; j < list.size(); j++) {
+                    matrix[i][j] = list.get(j);
+                }
+            }
+        }
+        return matrix;
+    }
 
-    public static int[][] createMatrix() {
-        int[][] matrix = new int[1000][];
+    public static int[][] createMatrix(int size) {
+        int[][] matrix = new int[size][];
         HashSet<Integer> idSet = new HashSet<>();
         HashMap<Integer, Integer> idMap = new HashMap<>();
-        for (int i = 2; i <= 1001; i++) {
-            List<Integer> list = getRefListFromDB(i);
-            matrix[i - 2] = new int[list.size()];
+        for (int i = 0; i < size; i++) {
+            List<Integer> list = getRefListFromDB(i+1);
+            matrix[i] = new int[list.size()];
             for (int j = 0; j < list.size(); j++) {
-                matrix[i - 2][j] = list.get(j);
+                matrix[i][j] = list.get(j);
                 idSet.add(list.get(j));
             }
         }
@@ -135,10 +180,18 @@ public class ASNDb {
         }
         return matrix;
     }
+    
+    public void saveDocumentMatrix(int[][] matrix){
+        SparkConf conf = new SparkConf().setAppName("Spark save");
+        JavaSparkContext context = new JavaSparkContext(conf);
+        //List<Integer[]> list = Arrays.stream(matrix).collect(Collectors.toList());
+    }
 
     public static void main(String[] args) {
+        ASNDb db = new ASNDb();
         //getPaperCitationByYear(2005,"/Users/thucnt/git/ETD/data/papers2005.txt");
-        int[][] documents = createMatrix();
+        int[][] documents = db.createMatrixFromYear(1990);
+//        int[][] documents = createMatrix(100);
 //        int key = 0;
 //        for (Integer id : idSet){
 //            key++;
