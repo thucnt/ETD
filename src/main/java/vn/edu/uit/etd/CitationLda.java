@@ -30,7 +30,7 @@ public class CitationLda {
 
     public static void main(String[] args) {
         String citationFile = "/Users/thucnt/git/ETD/data/papers2005.txt";
-        Corpus corpus = new Corpus(citationFile,10000);
+        Corpus corpus = new Corpus(citationFile,1000);
 
         int[][] documents = corpus.getDocumentMatrix();
 //        int[][] documents = {
@@ -71,9 +71,9 @@ public class CitationLda {
             System.out.print("         " + m % 10 + "           ");
         }
         System.out.println();
-        HashMap<Integer,List<Integer>> topicsKeyPapers = new HashMap<>();
+        HashMap<Integer,List<Integer>> topicsList = new HashMap<>();
         for (int i = 0; i < K; i++){
-            topicsKeyPapers.put(i, new ArrayList<>());
+            topicsList.put(i, new ArrayList<>());
         }
         
         for (int m = 0; m < theta.length; m++) {
@@ -81,37 +81,37 @@ public class CitationLda {
             for (int k = 0; k < theta[m].length; k++) {
                 System.out.print(theta[m][k] + "\t");
                 if (theta[m][k] >= 0.7)
-                    topicsKeyPapers.get(k).add(m);
+                    topicsList.get(k).add(m);
                 //System.out.print(shadeDouble(theta[m][k], 1) + " ");
             }
             System.out.println();
         }
         System.out.println();
-        for (Map.Entry<Integer,List<Integer>> entry : topicsKeyPapers.entrySet()){
+        for (Map.Entry<Integer,List<Integer>> entry : topicsList.entrySet()){
             Integer topic = entry.getKey();
             List<Integer> keys = entry.getValue();
-            System.out.println("Key papers of topic: " + topic);
+            System.out.println("Papers of topic: " + topic);
             for (Integer i : keys){
-                System.out.print(i + "\t");
+                System.out.print(i + ";");
             }
             System.out.println();
         }       
-//        System.out.println("Topic--Term Associations, Phi[k][w] (beta=" + beta
-//                + ")");
-//
-//        System.out.print("k\\w\t");
-//        for (int w = 0; w < phi[0].length; w++) {
-//            System.out.print("   " + w % 10 + "    ");
-//        }
-//        System.out.println();
-//        for (int k = 0; k < phi.length; k++) {
-//            System.out.print(k + "\t");
-//            for (int w = 0; w < phi[k].length; w++) {
-//                System.out.print(phi[k][w] + " ");
-//                //System.out.print(shadeDouble(phi[k][w], 1) + " ");
-//            }
-//            System.out.println();
-//        }
+        System.out.println("Topic--Term Associations, Phi[k][w] (beta=" + beta
+                + ")");
+
+        System.out.print("k\\w\t");
+        for (int w = 0; w < phi[0].length; w++) {
+            System.out.print("   " + w % 10 + "    ");
+        }
+        System.out.println();
+        for (int k = 0; k < phi.length; k++) {
+            System.out.print(k + "\t");
+            for (int w = 0; w < phi[k].length; w++) {
+                System.out.print(phi[k][w] + " ");
+                //System.out.print(shadeDouble(phi[k][w], 1) + " ");
+            }
+            System.out.println();
+        }
         // Let's inference a new document
 //        int[] aNewDocument = {2, 2, 4, 2, 4, 2, 2, 2, 2, 4, 2, 2};
 //        double[] newTheta = inference(alpha, beta, phi, aNewDocument);
