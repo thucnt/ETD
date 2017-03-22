@@ -86,10 +86,10 @@ public class ASNDb {
                 rs2 = refPapers.executeQuery();
                 StringBuilder outputLine = new StringBuilder();
                 outputLine.append(id);
-                outputLine.append(";");
+                outputLine.append("\t");
                 while (rs2.next()) {
                     outputLine.append(rs2.getInt("idPaperRef"));
-                    outputLine.append(",");
+                    outputLine.append("\t");
                 }
                 outputLine.deleteCharAt(outputLine.length() - 1);
                 outStream.write(outputLine.toString());
@@ -189,8 +189,8 @@ public class ASNDb {
 
     public static void main(String[] args) {
         ASNDb db = new ASNDb();
-        //getPaperCitationByYear(2005,"/Users/thucnt/git/ETD/data/papers2005.txt");
-        int[][] documents = db.createMatrixFromYear(1990);
+        getPaperCitationByYear(2005,"/Users/thucnt/git/ETD/data/papers2005.txt");
+//        int[][] documents = db.createMatrixFromYear(1990);
 //        int[][] documents = createMatrix(100);
 //        int key = 0;
 //        for (Integer id : idSet){
