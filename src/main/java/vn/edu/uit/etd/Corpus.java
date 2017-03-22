@@ -75,9 +75,9 @@ public class Corpus {
                 }
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
+            //Logger.getLogger(CitationLda.class.getName()).log(Level.SEVERE, null, ex);
         }
         //documents = new int[corpusId2PaperId.entrySet().size()][];
         documents = new int[papers.size()][];
