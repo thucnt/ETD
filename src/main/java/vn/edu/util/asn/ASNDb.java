@@ -14,16 +14,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 
 /**
  *
@@ -182,9 +178,7 @@ public class ASNDb {
     }
     
     public void saveDocumentMatrix(int[][] matrix){
-        SparkConf conf = new SparkConf().setAppName("Spark save");
-        JavaSparkContext context = new JavaSparkContext(conf);
-        //List<Integer[]> list = Arrays.stream(matrix).collect(Collectors.toList());
+        
     }
 
     public static void main(String[] args) {
