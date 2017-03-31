@@ -38,6 +38,8 @@ public class AMinerParser {
                 p.setAbs(content);
             else if (key.startsWith("#%"))
                 p.addRef(new Long(content));
+            else if (key.startsWith("#t"))
+                p.setYear(new Integer(content));
         }
         if (p.getRefList() == null){
             p.addRef(p.getId());

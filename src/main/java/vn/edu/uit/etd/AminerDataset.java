@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -22,6 +23,21 @@ import java.util.logging.Logger;
  * @author thucnt
  */
 public class AminerDataset {
+    public static void writePapers(String dataFolder, int year,String id, String content){
+        File folder = new File(dataFolder + File.pathSeparator + year);
+        if (!folder.exists()){
+            folder.mkdir();
+        }
+        File f = new File(folder,id + ".txt");
+        BufferedWriter output = null;
+        try {
+            output = new BufferedWriter(new FileWriter(f));
+            output.write(content);
+            output.close();
+        } catch (IOException ex) {
+            Logger.getLogger(AminerDataset.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public static void main(String[] args){
         File f = new File("/Users/thucnt/Downloads/dblp/original-data/AMiner-Paper.txt");
         AMinerParser parser = new AMinerParser("data");
@@ -50,7 +66,8 @@ public class AminerDataset {
                             content = p.getTitle();
                         else
                             content = p.getTitle() + "; " + content;
-                        papersOutput.println(p.getId() + " " + content);
+                        //papersOutput.println(p.getId() + " " + content);
+                        writePapers("data",p.getYear(),p.getId().toString(),p.getTitle() + ". " + p.getAbs());
                         List<Long> refList = p.getRefList();
                         StringBuilder line = new StringBuilder();
                         line.append(p.getId() + ";");
