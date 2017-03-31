@@ -17,7 +17,15 @@ public class Paper {
     private String title;
     private List<Long> refList;
     private String abs;
+    private int year;
 
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
     
     public void addRef(Long id){
         if (refList == null)
