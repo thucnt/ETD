@@ -22,9 +22,9 @@ public class AMinerParser {
         
     }
     
-    public Paper parse(List<String> paper){
+    public Paper parse(List<String> strList){
         Paper p = new Paper();
-        for (String s : paper){
+        for (String s : strList){
             int space = s.indexOf(' ');
             if (space == -1)
                 continue;
@@ -38,8 +38,22 @@ public class AMinerParser {
                 p.setAbs(content);
             else if (key.startsWith("#%"))
                 p.addRef(new Long(content));
-            else if (key.startsWith("#t"))
-                p.setYear(new Integer(content));
+            else if (key.startsWith("#t")){
+                if (!content.isEmpty()){
+                    p.setYear(new Integer(content));
+                }
+                else{
+                    p.setYear(0);
+                }
+//                int year = 1900;
+//                try{
+//                    year = new Integer(content);
+//                    p.setYear(year);
+//                }
+//                catch(NumberFormatException e){
+//                    System.out.println(e.getMessage());
+//                }
+            }
         }
         if (p.getRefList() == null){
             p.addRef(p.getId());
