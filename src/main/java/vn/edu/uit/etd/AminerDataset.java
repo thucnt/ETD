@@ -23,31 +23,50 @@ import java.util.logging.Logger;
  * @author thucnt
  */
 public class AminerDataset {
-    public static void writePapers(String dataFolder, int year,String id, String content){
-        File folder = new File(dataFolder + File.pathSeparator + year);
+    public static void writePapers(String dataFolder, Paper p){
+        Integer year = p.getYear();
+        String folderName = dataFolder + File.separator;
+        if (year == null){
+            folderName += "all";
+        }
+        else{
+            folderName += year;
+        }
+        File folder = new File(folderName);
         if (!folder.exists()){
             folder.mkdir();
         }
-        File f = new File(folder,id + ".txt");
+        File f = new File(folder,p.getId() + ".txt");
         BufferedWriter output = null;
         try {
             output = new BufferedWriter(new FileWriter(f));
-            output.write(content);
+            StringBuilder content = new StringBuilder();
+            content.append(p.getTitle());
+            String abs = p.getAbs();
+            if (abs != null)
+                content.append(". " + abs);
+            output.write(content.toString());
             output.close();
         } catch (IOException ex) {
             Logger.getLogger(AminerDataset.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public static void writeIdYearTitleFile(PrintWriter outFile,Paper p){
+        String line = p.getId() + " " + p.getYear() + " " + p.getTitle() + "\n";
+        outFile.println(line);
+    }
     public static void main(String[] args){
         File f = new File("/Users/thucnt/Downloads/dblp/original-data/AMiner-Paper.txt");
-        AMinerParser parser = new AMinerParser("data");
+        AMinerParser parser = new AMinerParser("/Users/thucnt/Downloads/dblp/data");
         long count = 0;
+        
         try {
             Scanner aminerInput = new Scanner(new FileInputStream(f));
-            PrintWriter papersOutput = new PrintWriter(new FileWriter("data/papers.txt"));
-            PrintWriter paperCitationOutput = new PrintWriter(new FileWriter("data/papers_citation.txt"));
+            PrintWriter papersOutput = new PrintWriter(new FileWriter("D:\\aminer\\papers.txt"));
+            PrintWriter paperCitationOutput = new PrintWriter(new FileWriter("D:\\aminer\\papers_citation.txt"));
+            PrintWriter idYearTitleFile = new PrintWriter(new BufferedWriter(new FileWriter("/Users/thucnt/Downloads/dblp/data/IdYearTitle.txt")));
             String s = null;
-            List<String> paper = null;
+            List<String> strList = null;
             while ((s = aminerInput.nextLine()) != null){
                 if ((count % 10000) == 0){
                     System.out.println("Papers: " + count);
@@ -58,33 +77,35 @@ public class AminerDataset {
 //                    break;
                 }
                 if (s.startsWith("#index")){
-                    if (paper != null){
+                    if (strList != null){
                         count++;
-                        Paper p = parser.parse(paper);
-                        String content = p.getAbs();
-                        if (content == null)
-                            content = p.getTitle();
-                        else
-                            content = p.getTitle() + "; " + content;
+                        Paper p = parser.parse(strList);
+                        writeIdYearTitleFile(idYearTitleFile,p);
+//                        String content = p.getAbs();
+//                        if (content == null)
+//                            content = p.getTitle();
+//                        else
+//                            content = p.getTitle() + "; " + content;
                         //papersOutput.println(p.getId() + " " + content);
-                        writePapers("data",p.getYear(),p.getId().toString(),p.getTitle() + ". " + p.getAbs());
-                        List<Long> refList = p.getRefList();
-                        StringBuilder line = new StringBuilder();
-                        line.append(p.getId() + ";");
-                        for (Long l : refList){
-                            line.append(l + ",");
-                        }
-                        paperCitationOutput.println(line);
+                        //writePapers("D:\\aminer",p);
+//                        List<Long> refList = p.getRefList();
+//                        StringBuilder line = new StringBuilder();
+//                        line.append(p.getId() + ";");
+//                        for (Long l : refList){
+//                            line.append(l + ",");
+//                        }
+                        //paperCitationOutput.println(line);
                     }
-                    paper = new ArrayList();
+                    strList = new ArrayList();
                 }
-//                System.out.println(s);
-                paper.add(s);
+                strList.add(s);
             }
             papersOutput.flush();
             papersOutput.close();
             paperCitationOutput.flush();
             paperCitationOutput.close();
+            idYearTitleFile.flush();
+            idYearTitleFile.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(AminerDataset.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
